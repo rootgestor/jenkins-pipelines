@@ -7,7 +7,7 @@ pipeline {
           steps {
             sh 'rm -rf backoffice'
             sh 'git clone git@github.com:rootgestor/backoffice.git'
-            yarn(command: 'yarn', workspaceSubdirectory: 'backoffice')
+            yarn(command: 'install', workspaceSubdirectory: 'backoffice')
           }
         }
 
@@ -15,7 +15,7 @@ pipeline {
           steps {
             sh 'rm -rf backoffice-backend'
             sh 'git clone git@github.com:rootgestor/backoffice-backend.git'
-            yarn(command: 'yarn', workspaceSubdirectory: 'backoffice-backend')
+            yarn(command: 'install', workspaceSubdirectory: 'backoffice-backend')
           }
         }
 
@@ -24,7 +24,7 @@ pipeline {
 
     stage('build frontend') {
       steps {
-        yarn(command: 'yarn build', workspaceSubdirectory: 'backoffice')
+        yarn(command: 'build', workspaceSubdirectory: 'backoffice')
       }
     }
 
