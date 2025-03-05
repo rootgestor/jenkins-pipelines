@@ -1,5 +1,10 @@
 pipeline {
   agent any
+  environment {
+    REACT_APP_API_BACK = credentials('ROOTGESTOR_BACKOFFICE_API_URL')
+    API_KEY = credentials('ROOTGESTOR_BACKOFFICE_API_KEY')
+    UPLOADS_CDN_PATH = credentials('UPLOADS_FRONTEND_CDN_PATH')
+  }
   stages {
     stage('Install frontend dependencies') {
       parallel {
@@ -25,11 +30,6 @@ pipeline {
     }
 
     stage('build frontend') {
-      environment {
-        REACT_APP_API_BACK = credentials('ROOTGESTOR_BACKOFFICE_API_URL')
-        API_KEY = credentials('ROOTGESTOR_BACKOFFICE_API_KEY')
-        UPLOADS_CDN_PATH = credentials('UPLOADS_FRONTEND_CDN_PATH')
-      }
       steps {
         yarn(command: 'build', workspaceSubdirectory: 'backoffice')
       }
