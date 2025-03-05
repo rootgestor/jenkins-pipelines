@@ -5,6 +5,8 @@ pipeline {
       parallel {
         stage('Install frontend dependencies') {
           steps {
+            sh 'rm -rf backoffice'
+            sh 'git clone git@github.com:rootgestor/backoffice.git'
             yarn(command: 'yarn', workspaceSubdirectory: 'backoffice')
           }
         }
