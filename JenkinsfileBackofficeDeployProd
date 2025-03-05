@@ -12,7 +12,7 @@ pipeline {
           steps {
             sh 'rm -rf backoffice'
             sh 'git clone git@github.com:rootgestor/backoffice.git'
-            sh 'git clone --recurse-submodules git@github.com:rootgestor/isolib.git common/isolib'
+            sh 'cd backoffice && git clone --recurse-submodules git@github.com:rootgestor/isolib.git common/isolib'
             yarn(command: 'install', workspaceSubdirectory: 'backoffice')
           }
         }
@@ -21,7 +21,7 @@ pipeline {
           steps {
             sh 'rm -rf backoffice-backend'
             sh 'git clone git@github.com:rootgestor/backoffice-backend.git'
-            sh 'git clone --recurse-submodules git@github.com:rootgestor/backend-common.git common'
+            sh 'cd backoffice-backend && git clone --recurse-submodules git@github.com:rootgestor/backend-common.git common'
             yarn(command: 'install', workspaceSubdirectory: 'backoffice-backend')
           }
         }
