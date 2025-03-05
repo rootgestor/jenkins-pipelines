@@ -1,10 +1,4 @@
 pipeline {
-  agent {
-    node {
-      label 'nodeJS'
-    }
-
-  }
   stages {
     stage('Install frontend dependencies') {
       parallel {
