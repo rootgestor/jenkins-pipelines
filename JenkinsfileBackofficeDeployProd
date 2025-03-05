@@ -1,17 +1,10 @@
 pipeline {
   agent any
   stages {
-    stage('Clone frontend') {
-      steps {
-        echo 'Clonando frontend repo'
-        sh 'git clone git@github.com:rootgestor/frontend.git'
-      }
-    }
-
     stage('Install frontend dependencies') {
       steps {
-        echo 'yarn'
-        echo 'clone isolib submodule'
+        sh 'cd frontend'
+        yarn 'yarn'
       }
     }
 
