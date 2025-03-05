@@ -13,6 +13,8 @@ pipeline {
 
         stage('Install backend dependencies') {
           steps {
+            sh 'rm -rf backoffice-backend'
+            sh 'git clone git@github.com:rootgestor/backoffice-backend.git'
             yarn(command: 'yarn', workspaceSubdirectory: 'backoffice-backend')
           }
         }
@@ -22,7 +24,7 @@ pipeline {
 
     stage('build frontend') {
       steps {
-        echo 'yarn build'
+        yarn(command: 'yarn build', workspaceSubdirectory: 'backoffice')
       }
     }
 
@@ -34,7 +36,8 @@ pipeline {
 
     stage('Clean') {
       steps {
-        echo 'Clear files'
+        sh 'rm -rf backoffice'
+        sh 'rm -rf backoffice-backend'
       }
     }
 
