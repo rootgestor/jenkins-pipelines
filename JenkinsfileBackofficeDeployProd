@@ -2,9 +2,19 @@ pipeline {
   agent any
   stages {
     stage('Install frontend dependencies') {
-      steps {
-        sh 'cd frontend'
-        yarn 'yarn'
+      parallel {
+        stage('Install frontend dependencies') {
+          steps {
+            yarn(command: 'yarn', workspaceSubdirectory: 'backoffice')
+          }
+        }
+
+        stage('Install backend dependencies') {
+          steps {
+            yarn(command: 'yarn', workspaceSubdirectory: 'backoffice-backend')
+          }
+        }
+
       }
     }
 
