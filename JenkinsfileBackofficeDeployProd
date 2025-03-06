@@ -42,7 +42,7 @@ pipeline {
           string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
         ]) {
           sh '''
-          scp -i $AWS_KEY_PEM backoffice/dist/index.html $AWS_INSTANCE_SSH_URL:/var/www/html/demo/index.html
+          scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/demo/
           '''
         }
       }
