@@ -37,9 +37,12 @@ pipeline {
 
     stage('Publish') {
       steps {
-        withCredentials([sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM')]) {
+        withCredentials([
+          sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+          string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+        ]) {
           sh '''
-          scp -i $AWS_KEY_PEM backoffice/dist/index.html ubuntu@ec2-3-147-59-32.us-east-2.compute.amazonaws.com:/var/www/html/demo/index.html
+          scp -i $AWS_KEY_PEM backoffice/dist/index.html $AWS_INSTANCE_SSH_URL:/var/www/html/demo/index.html
           '''
         }
       }
