@@ -37,7 +37,11 @@ pipeline {
 
     stage('Publish') {
       steps {
-        sh '~/.local/bin/aws s3 cp backoffice/dist s3://rootgestor-frontend/ --recursive'
+        withCredentials([sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM')]) {
+          sh '''
+          scp -i $AWS_KEY_PEM backoffice/dist/index.html ubuntu@ec2-3-147-59-32.us-east-2.compute.amazonaws.com:/var/www/html/demo/index.html
+          '''
+        }
       }
     }
 
