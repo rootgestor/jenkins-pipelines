@@ -37,7 +37,7 @@ pipeline {
 
     stage('Publish') {
       steps {
-        sh '~/.local/bin/aws s3 cp backoffice/dist s3://rootgestor-frontend/beta/ --recursive'
+        sh '~/.local/bin/aws s3 cp backoffice/dist s3://rootgestor-frontend/ --recursive'
       }
     }
 
