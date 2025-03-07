@@ -21,32 +21,28 @@ pipeline {
       }
     }
 
-    stage('Publish Backoffice') {
-      parallel {
-        stage('Publish frontend') {
-          steps {
-            withCredentials([
-              sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
-            ]) {
-              sh '''
-              scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/backoffice/
-              '''
-            }
-          }
+    stage('Publish frontend') {
+      steps {
+        withCredentials([
+          sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+          string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+        ]) {
+          sh '''
+          scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/backoffice/
+          '''
         }
+      }
+    }
 
-        stage('Publish backend') {
-          steps {
-            withCredentials([
-              sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
-            ]) {
-              sh '''
-              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_SSH_URL 'cd ~/opt/apps/backoffice-backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
-              '''
-            }
-          }
+    stage('Publish backend') {
+      steps {
+        withCredentials([
+          sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+          string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+        ]) {
+          sh '''
+          ssh -i $AWS_KEY_PEM $AWS_INSTANCE_SSH_URL 'cd ~/opt/apps/backoffice-backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
+          '''
         }
       }
     }
