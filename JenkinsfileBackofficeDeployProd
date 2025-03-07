@@ -7,25 +7,11 @@ pipeline {
   }
   stages {
     stage('Install frontend dependencies') {
-      parallel {
-        stage('Install frontend dependencies') {
-          steps {
-            sh 'rm -rf backoffice'
-            sh 'git clone git@github.com:rootgestor/backoffice.git'
-            sh 'cd backoffice && git clone --recurse-submodules git@github.com:rootgestor/isolib.git common/isolib'
-            yarn(command: 'install', workspaceSubdirectory: 'backoffice')
-          }
-        }
-
-        stage('Install backend dependencies') {
-          steps {
-            sh 'rm -rf backoffice-backend'
-            sh 'git clone git@github.com:rootgestor/backoffice-backend.git'
-            sh 'cd backoffice-backend && git clone --recurse-submodules git@github.com:rootgestor/backend-common.git common'
-            yarn(command: 'install', workspaceSubdirectory: 'backoffice-backend')
-          }
-        }
-
+      steps {
+        sh 'rm -rf backoffice'
+        sh 'git clone git@github.com:rootgestor/backoffice.git'
+        sh 'cd backoffice && git clone --recurse-submodules git@github.com:rootgestor/isolib.git common/isolib'
+        yarn(command: 'install', workspaceSubdirectory: 'backoffice')
       }
     }
 
@@ -35,15 +21,32 @@ pipeline {
       }
     }
 
-    stage('Publish') {
-      steps {
-        withCredentials([
-          sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-          string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
-        ]) {
-          sh '''
-          scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/demo/
-          '''
+    stage('Publish Backoffice') {
+      parallel {
+        stage('Publish frontend') {
+          steps {
+            withCredentials([
+              sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+            ]) {
+              sh '''
+              scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/backoffice/
+              '''
+            }
+          }
+        }
+
+        stage('Publish backend') {
+          steps {
+            withCredentials([
+              sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+            ]) {
+              sh '''
+              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_SSH_URL 'cd ~/opt/apps/backoffice-backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
+              '''
+            }
+          }
         }
       }
     }
@@ -51,7 +54,6 @@ pipeline {
     stage('Clean') {
       steps {
         sh 'rm -rf backoffice'
-        sh 'rm -rf backoffice-backend'
       }
     }
 
