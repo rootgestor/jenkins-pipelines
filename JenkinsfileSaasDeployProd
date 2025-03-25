@@ -10,17 +10,16 @@ pipeline {
       }
     }
 
-    stage('build frontend') {
-      steps {
-        yarn(command: 'build', workspaceSubdirectory: 'frontend')
-      }
-    }
-
     stage('Publish Saas') {
-      environment {
-        REACT_APP_API_BACK = credentials('ROOTGESTOR_SAAS_API_URL')
-        API_KEY = credentials('ROOTGESTOR_SAAS_API_KEY')
-        UPLOADS_CDN_PATH = credentials('UPLOADS_SAAS_CDN_PATH')
+      stage('Build') {
+        environment {
+          REACT_APP_API_BACK = credentials('ROOTGESTOR_SAAS_API_URL')
+          API_KEY = credentials('ROOTGESTOR_SAAS_API_KEY')
+          UPLOADS_CDN_PATH = credentials('UPLOADS_SAAS_CDN_PATH')
+        }
+        steps {
+          yarn(command: 'build', workspaceSubdirectory: 'frontend')
+        }
       }
       parallel {
         stage('Publish frontend') {
@@ -52,10 +51,15 @@ pipeline {
     }
 
     stage('Publish Demo') {
-      environment {
-        REACT_APP_API_BACK = credentials('ROOTGESTOR_DEMO_API_URL')
-        API_KEY = credentials('ROOTGESTOR_DEMO_API_KEY')
-        UPLOADS_CDN_PATH = credentials('UPLOADS_DEMO_CDN_PATH')
+      stage('Build') {
+        environment {
+          REACT_APP_API_BACK = credentials('ROOTGESTOR_DEMO_API_URL')
+          API_KEY = credentials('ROOTGESTOR_DEMO_API_KEY')
+          UPLOADS_CDN_PATH = credentials('UPLOADS_DEMO_CDN_PATH')
+        }
+        steps {
+          yarn(command: 'build', workspaceSubdirectory: 'frontend')
+        }
       }
       parallel {
         stage('Publish frontend') {
