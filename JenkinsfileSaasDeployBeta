@@ -1,9 +1,9 @@
 pipeline {
   agent any
   environment {
-    REACT_APP_API_BACK = credentials('ROOTGESTOR_DEMO_API_URL')
-    API_KEY = credentials('ROOTGESTOR_DEMO_API_KEY')
-    UPLOADS_CDN_PATH = credentials('UPLOADS_DEMO_CDN_PATH')
+    REACT_APP_API_BACK = credentials('ROOTGESTOR_BETA_API_URL')
+    API_KEY = credentials('ROOTGESTOR_BETA_API_KEY')
+    UPLOADS_CDN_PATH = credentials('UPLOADS_BETA_CDN_PATH')
   }
   stages {
     stage('Install frontend dependencies') {
