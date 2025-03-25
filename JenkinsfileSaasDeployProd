@@ -1,10 +1,5 @@
 pipeline {
   agent any
-  environment {
-    REACT_APP_API_BACK = credentials('ROOTGESTOR_SAAS_API_URL')
-    API_KEY = credentials('ROOTGESTOR_SAAS_API_KEY')
-    UPLOADS_CDN_PATH = credentials('UPLOADS_SAAS_CDN_PATH')
-  }
   stages {
     stage('Install frontend dependencies') {
       steps {
@@ -21,7 +16,12 @@ pipeline {
       }
     }
 
-    stage('Publish Saas and Demo') {
+    stage('Publish Saas') {
+      environment {
+        REACT_APP_API_BACK = credentials('ROOTGESTOR_SAAS_API_URL')
+        API_KEY = credentials('ROOTGESTOR_SAAS_API_KEY')
+        UPLOADS_CDN_PATH = credentials('UPLOADS_SAAS_CDN_PATH')
+      }
       parallel {
         stage('Publish frontend') {
           steps {
@@ -31,7 +31,6 @@ pipeline {
             ]) {
               sh '''
               scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_FRONTEND_PROD_URL:/usr/share/nginx/html/saas/
-              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_FRONTEND_PROD_URL:/usr/share/nginx/html/demo/
               '''
             }
           }
@@ -45,6 +44,40 @@ pipeline {
             ]) {
               sh '''
               ssh -i $AWS_KEY_PEM $AWS_INSTANCE_BACKEND_PROD_URL 'source ~/.nvm/nvm.sh && cd ~/opt/apps/backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
+              '''
+            }
+          }
+        }
+      }
+    }
+
+    stage('Publish Demo') {
+      environment {
+        REACT_APP_API_BACK = credentials('ROOTGESTOR_DEMO_API_URL')
+        API_KEY = credentials('ROOTGESTOR_DEMO_API_KEY')
+        UPLOADS_CDN_PATH = credentials('UPLOADS_DEMO_CDN_PATH')
+      }
+      parallel {
+        stage('Publish frontend') {
+          steps {
+            withCredentials([
+              sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+              string(credentialsId: 'AWS_INSTANCE_FRONTEND_PROD_URL', variable: 'AWS_INSTANCE_FRONTEND_PROD_URL')
+            ]) {
+              sh '''
+              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_FRONTEND_PROD_URL:/usr/share/nginx/html/demo/
+              '''
+            }
+          }
+        }
+
+        stage('Publish backend') {
+          steps {
+            withCredentials([
+              sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
+              string(credentialsId: 'AWS_INSTANCE_BACKEND_PROD_URL', variable: 'AWS_INSTANCE_BACKEND_PROD_URL')
+            ]) {
+              sh '''
               ssh -i $AWS_KEY_PEM $AWS_INSTANCE_BACKEND_PROD_URL 'source ~/.nvm/nvm.sh && cd ~/opt/apps/backend-demo/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
               '''
             }
