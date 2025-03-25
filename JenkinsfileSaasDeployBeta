@@ -30,7 +30,7 @@ pipeline {
               string(credentialsId: 'AWS_INSTANCE_DEMO_URL', variable: 'AWS_INSTANCE_DEMO_URL')
             ]) {
               sh '''
-              scp -i $AWS_KEY_PEM frontend/dist/* AWS_INSTANCE_DEMO_URL:/usr/share/nginx/html/saas/
+              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_DEMO_URL:/usr/share/nginx/html/saas/
               '''
             }
           }
