@@ -27,10 +27,10 @@ pipeline {
           steps {
             withCredentials([
               sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+              string(credentialsId: 'AWS_INSTANCE_FRONTEND_PROD_URL', variable: 'AWS_INSTANCE_FRONTEND_PROD_URL')
             ]) {
               sh '''
-              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/saas/
+              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_FRONTEND_PROD_URL:/var/www/html/saas/
               '''
             }
           }
@@ -40,10 +40,10 @@ pipeline {
           steps {
             withCredentials([
               sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+              string(credentialsId: 'AWS_INSTANCE_BACKEND_PROD_URL', variable: 'AWS_INSTANCE_BACKEND_PROD_URL')
             ]) {
               sh '''
-              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_SSH_URL 'source ~/.nvm/nvm.sh && cd ~/opt/apps/backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
+              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_BACKEND_PROD_URL 'source ~/.nvm/nvm.sh && cd ~/opt/apps/backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
               '''
             }
           }
@@ -57,10 +57,10 @@ pipeline {
           steps {
             withCredentials([
               sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_DEMO_URL', variable: 'AWS_INSTANCE_DEMO_URL')
+              string(credentialsId: 'AWS_INSTANCE_FRONTEND_PROD_URL', variable: 'AWS_INSTANCE_FRONTEND_PROD_URL')
             ]) {
               sh '''
-              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_DEMO_URL:/usr/share/nginx/html/demo/
+              scp -i $AWS_KEY_PEM frontend/dist/* $AWS_INSTANCE_FRONTEND_PROD_URL:/usr/share/nginx/html/demo/
               '''
             }
           }
@@ -70,10 +70,10 @@ pipeline {
           steps {
             withCredentials([
               sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_DEMO_URL', variable: 'AWS_INSTANCE_DEMO_URL')
+              string(credentialsId: 'AWS_INSTANCE_BACKEND_PROD_URL', variable: 'AWS_INSTANCE_BACKEND_PROD_URL')
             ]) {
               sh '''
-              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_DEMO_URL 'source ~/.nvm/nvm.sh && cd /opt/apps/backend-demo/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
+              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_BACKEND_PROD_URL 'source ~/.nvm/nvm.sh && cd /opt/apps/backend-demo/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
               '''
             }
           }
