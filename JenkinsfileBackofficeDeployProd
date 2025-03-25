@@ -27,10 +27,10 @@ pipeline {
           steps {
             withCredentials([
               sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+              string(credentialsId: 'AWS_INSTANCE_BACKOFFICE_URL', variable: 'AWS_INSTANCE_BACKOFFICE_URL')
             ]) {
               sh '''
-              scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_SSH_URL:/var/www/html/backoffice/
+              scp -i $AWS_KEY_PEM backoffice/dist/* $AWS_INSTANCE_BACKOFFICE_URL:/usr/share/nginx/html/backoffice/
               '''
             }
           }
@@ -40,10 +40,10 @@ pipeline {
           steps {
             withCredentials([
               sshUserPrivateKey(credentialsId: 'AWS_KEY_PEM', keyFileVariable: 'AWS_KEY_PEM'),
-              string(credentialsId: 'AWS_INSTANCE_SSH_URL', variable: 'AWS_INSTANCE_SSH_URL')
+              string(credentialsId: 'AWS_INSTANCE_BACKOFFICE_URL', variable: 'AWS_INSTANCE_BACKOFFICE_URL')
             ]) {
               sh '''
-              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_SSH_URL 'source ~/.nvm/nvm.sh && cd ~/opt/apps/backoffice-backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
+              ssh -i $AWS_KEY_PEM $AWS_INSTANCE_BACKOFFICE_URL 'source ~/.nvm/nvm.sh && cd ~/opt/apps/backoffice-backend/common && git pull origin master && cd .. && git pull origin master && yarn && yarn restart:pm2'
               '''
             }
           }
